@@ -104,3 +104,70 @@ binv <- read_delim(
 
 #write_csv
 binv %>% write_csv("intermediates/binv.csv")
+
+
+#rationalization list
+ratlist <- read_csv(
+  "inputs/ratlist.csv",
+  col_types = cols(.default = "c")
+)
+
+
+
+### simple cut (python later)
+FCstopdates <- FC %>%
+  #start with distinct part provs
+  select(Part, Prov) %>%
+  distinct() %>%
+  
+  #add exit dates (filtered to remove indefinite items)
+  left_join(
+    FC %>% 
+      group_by(Part,Prov) %>%
+      summarise(ExitDate = max(Date), .groups = "drop") %>%
+      filter(ExitDate < max(ExitDate)),
+    join_by(Part, Prov),
+    relationship = "one-to-one"
+  )
+
+outputdata <- ratlist %>%
+  #add stop dates
+  left_join(
+    FCstopdates,
+    join_by(name == Part),
+    relationship = "one-to-many"
+  ) %>%
+  #add board inventory
+  left_join(
+    binv %>%
+      select(part_number, province, ttl_pipeline) %>%
+      rename(boardinv = ttl_pipeline),
+    join_by(name == part_number, Prov == province),
+    relationship = "one-to-one"
+  ) %>%
+  #add medical inventory
+  left_join(
+    Inv_Med %>%
+      select(part, available) %>%
+      mutate(prov = "MED") %>%
+      group_by(part, prov) %>%
+      summarise(medinv = sum(available), .groups = "drop"),
+    join_by(name == part, Prov == prov),
+    relationship = "one-to-one"
+  ) %>%
+  #add stamped inv
+  left_join(
+    Inv_Rec_Stamped %>%
+      group_by(part, pool) %>%
+      summarise(stamped = sum(available), .groups = "drop"),
+    join_by(name == part, Prov == pool),
+    relationship = "one-to-one"
+  ) %>%
+  #add unstamped inventory
+  left_join(
+    Inv_Rec_Unstamped %>%
+      group_by(part) %>%
+      summarise(unstamped = sum(available), .groups = "drop"),
+    join_by(name == part),
+    relationship = "many-to-one"
+  )
