@@ -1,5 +1,5 @@
 from .simulation import Simulation
-import copy
+
 
 class Inventory:
     def __init__(self, part, prov, channel, lot, manufactured, qty, sim):

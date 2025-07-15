@@ -2,7 +2,7 @@
 
 from datetime import datetime, timedelta
 
-PUBLISH_DATE = datetime(2025, 7, 4)
+PUBLISH_DATE = datetime(2025, 7, 4).date()
 FCSTART = PUBLISH_DATE + timedelta(days=3)
 CURRENTWK = PUBLISH_DATE - timedelta(days=4)
 LASTACTUALS = FCSTART - timedelta(days=7)

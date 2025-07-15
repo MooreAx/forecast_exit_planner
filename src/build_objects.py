@@ -3,7 +3,7 @@
 import pandas as pd
 from .simulation import Simulation
 from .inventory import Inventory
-from .read_data import df_forecast, df_inv_med, df_board_inventory, df_inv_rec_stamped, df_inv_rec_unstamped
+from .read_data import df_forecast, df_inv_med, df_board_inventory, df_inv_rec_stamped, df_inv_rec_unstamped, df_rat_list
 from .globals import *
 
 from collections import namedtuple
@@ -16,8 +16,8 @@ ForecastKey = namedtuple("ForecastKey", ["part", "prov", "channel", "week"])
 ForecastVal = namedtuple("ForecastVal", ["qty", "pod"])
 
 forecast_dict = {
-    ForecastKey(row['part'], row['prov'], row['channel'], pd.to_datetime(row['date'])):
-    ForecastVal(int(row['fc']), row['pod'])
+    ForecastKey(part=row['part'], prov=row['prov'], channel=row['channel'], week=row['date']):
+    ForecastVal(qty=int(row['fc']), pod=row['pod'])
     for _, row in df_forecast.iterrows()
 }
 
@@ -67,7 +67,7 @@ board_inventory_list = [
     Inventory(
         part = row['part_number'],
         prov = row['province'],
-        channel = 'Rec',
+        channel = 'REC',
         lot = 'board_inv',
         manufactured = CURRENTWK,
         qty = row['ttl_pipeline'],
@@ -75,3 +75,7 @@ board_inventory_list = [
     )
     for _, row in df_board_inventory.iterrows()
 ]
+
+
+#rat list
+rat_list = df_rat_list.iloc[:,0].tolist()
