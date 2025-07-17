@@ -14,7 +14,7 @@ df_inv_rec_stamped = pd.read_csv("intermediates/Inv_Rec_Stamped.csv", dtype = st
 df_inv_rec_unstamped = pd.read_csv("intermediates/Inv_Rec_Unstamped.csv", dtype = str).clean_names()
 
 #board inv
-df_board_inventory = pd.read_csv("intermediates/binv.csv").clean_names()
+df_board_inventory = pd.read_csv("intermediates/binv.csv", thousands=',').clean_names()
 
 #rationalization list
 df_rat_list = pd.read_csv("inputs/ratlist.csv", dtype = str).clean_names()
@@ -31,6 +31,15 @@ df_forecast = (
     )
 )
 
+df_board_inventory = (
+    df_board_inventory
+    .assign(
+        part_number = lambda x: x['part_number'].astype(str),
+        ttl_pipeline = lambda x: pd.to_numeric(x['ttl_pipeline']).fillna(0)
+    )
+)
+
+
 def process_inv(df):
     df2 = (
         df
@@ -45,7 +54,6 @@ def process_inv(df):
 df_inv_med = process_inv(df_inv_med)
 df_inv_rec_stamped = process_inv(df_inv_rec_stamped)
 df_inv_rec_unstamped = process_inv(df_inv_rec_unstamped)
-
 
 # Display the first few rows
 print(df_forecast.head())

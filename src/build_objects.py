@@ -49,11 +49,11 @@ inv_rec_stamped_list = [
     for _, row in df_inv_rec_stamped.iterrows()
 ]
 
-inv_rec_unstamped_list = [
+inv_any_unstamped_list = [
     Inventory(
         part = row['part'],
-        prov = 'unstamped',
-        channel = 'REC',
+        prov = 'ANY',
+        channel = 'ANY',
         lot = row['lotnum'],
         manufactured = row['manufactured'],
         qty = int(row['available']),
@@ -62,19 +62,20 @@ inv_rec_unstamped_list = [
     for _, row in df_inv_rec_unstamped.iterrows()
 ]
 
-#note - might need to figure out logic so that board inv is always fresh
 board_inventory_list = [
     Inventory(
-        part = row['part_number'],
-        prov = row['province'],
+        part = str(row['part_number']),
+        prov = str(row['province']),
         channel = 'REC',
         lot = 'board_inv',
-        manufactured = CURRENTWK,
+        manufactured = datetime(2100, 1, 1).date(),  #future date = always fresh
         qty = row['ttl_pipeline'],
         sim = sim
     )
     for _, row in df_board_inventory.iterrows()
 ]
+
+
 
 
 #rat list

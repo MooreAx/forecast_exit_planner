@@ -10,5 +10,3 @@ LASTACTUALS = FCSTART - timedelta(days=7)
 
 #paths
 mape_bias_folder = r"C:\Users\alex.moore\OneDrive - Canopy Growth Corporation\Documents\Working Folder\R\mape_bias"
-source_data = r"C:\Users\alex.moore\OneDrive - Canopy Growth Corporation\Documents\Working Folder\python_forecasting\source-data"
-output_data = r"C:\Users\alex.moore\OneDrive - Canopy Growth Corporation\Documents\Working Folder\python_forecasting\output-data"

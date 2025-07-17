@@ -5,6 +5,7 @@ rm(list = ls())
 library(tidyverse)
 library(janitor)
 library(readxl)
+library(readr)
 
 InvFldr <- "C:/Users/alex.moore/OneDrive - Canopy Growth Corporation/Documents/Working Folder/Inventory/OHWSI"
 Downloads <- "C:/Users/alex.moore/Downloads"
@@ -50,11 +51,11 @@ InvData <- read_xlsx(
   clean_names() %>%
   select(name, number, is_stamped, pool, qa_status, warehouse, id, manufactured, available) %>%
   mutate(
-    manufactured = as.numeric(manufactured),
+    manufactured = parse_number(manufactured),
     manufactured = as.Date(manufactured, origin = "1899-12-30"),
     age = interval(manufactured, latest_file_date),
     age = time_length(age, "days"),
-    available = as.numeric(available)
+    available = parse_number(available)
   ) %>%
   filter(
     qa_status %in% c("A", "eComm-A"),
@@ -98,6 +99,11 @@ binv <- read_delim(
   col_types = cols(.default = "c")
 ) %>%
   clean_names() %>%
+  mutate(
+    inventory_qty = parse_number(inventory_qty),
+    on_order_qty = parse_number(on_order_qty),
+    ttl_pipeline = parse_number(ttl_pipeline)
+  ) %>%
   filter(week_end_date == max(week_end_date), licensed_producer == "CANOPY GROWTH CORP") %>%
   select(week_end_date, province, part_number, inventory_qty, on_order_qty, ttl_pipeline) %>%
   mutate(week_end_date = mdy(week_end_date))
@@ -111,7 +117,6 @@ ratlist <- read_csv(
   "inputs/ratlist.csv",
   col_types = cols(.default = "c")
 )
-
 
 
 ### simple cut (python later)
@@ -128,6 +133,12 @@ FCstopdates <- FC %>%
       filter(ExitDate < max(ExitDate)),
     join_by(Part, Prov),
     relationship = "one-to-one"
+  )
+
+totalFC <- FC %>%
+  group_by(Part, Prov) %>%
+  summarise(
+    totaldmd = sum(FC), .groups = "drop"
   )
 
 outputdata <- ratlist %>%
@@ -170,4 +181,12 @@ outputdata <- ratlist %>%
       summarise(unstamped = sum(available), .groups = "drop"),
     join_by(name == part),
     relationship = "many-to-one"
+  ) %>%
+  #add total demand
+  left_join(
+    totalFC,
+    join_by(name == Part, Prov),
+    relationship = "one-to-one"
   )
+
+
