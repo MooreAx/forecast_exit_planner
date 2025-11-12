@@ -106,7 +106,14 @@ binv <- read_delim(
   ) %>%
   filter(week_end_date == max(week_end_date), licensed_producer == "CANOPY GROWTH CORP") %>%
   select(week_end_date, province, part_number, inventory_qty, on_order_qty, ttl_pipeline) %>%
-  mutate(week_end_date = mdy(week_end_date))
+  mutate(week_end_date = mdy(week_end_date)) %>%
+  group_by(week_end_date, province, part_number) %>%
+  summarise(
+    inventory_qty = sum(inventory_qty),
+    on_order_qty = sum(on_order_qty),
+    ttl_pipeline = sum(ttl_pipeline),
+    .groups = "drop"
+  )
 
 #write_csv
 binv %>% write_csv("intermediates/binv.csv")

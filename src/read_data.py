@@ -19,6 +19,13 @@ df_board_inventory = pd.read_csv("intermediates/binv.csv", thousands=',').clean_
 #rationalization list
 df_rat_list = pd.read_csv("inputs/ratlist.csv", dtype = str).clean_names()
 
+''' ignore this for now... was trying to do a custom rat list, but it doesn't work bc of post-processing changes
+df_rat_list = pd.DataFrame(
+    '101901,101902,102408,102409,102625,102626'.split(sep = ","),
+    columns = ['name']
+)
+'''
+
 
 #clean up
 

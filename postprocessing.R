@@ -32,6 +32,7 @@ outputdata2 <- outputdata %>%
 
 outputdata2 %>% write_csv("outputs/inventorydata.csv")
 
+
 #calculate change in inventory
 delta_inv <- inv1 %>%
   select(part, prov, channel, lot, manufactured, age, qty_start) %>%
@@ -45,6 +46,8 @@ delta_inv <- inv1 %>%
     consumed_qty = qty_start - qty_end
   ) %>%
   filter(part %in% ratlist$name)
+
+delta_inv %>% write_csv("outputs/delta_inv.csv")
 
 outputdata3 <- outputdata2 %>%
   group_by(name) %>%
